@@ -170,6 +170,7 @@ class IAudio(model.Schema):
         required=False
     )
 
+
 alsoProvides(IAudio, IFormFieldProvider)
 
 
@@ -275,7 +276,9 @@ class Video(BaseAdapter):
     # image = UnsettableProperty(IVideo['image'])
 
     if youtube:
-        upload_video_to_youtube = BasicProperty(IVideo['upload_video_to_youtube'])
+        upload_video_to_youtube = BasicProperty(
+            IVideo['upload_video_to_youtube']
+        )
 
 
 class Audio(BaseAdapter):
