@@ -71,8 +71,9 @@ class IVideo(model.Schema):
         upload_video_to_youtube = schema.Bool(
             title=_(u'Upload to youtube'),
             description=_(u'Requires having youtube account connected. '
-                          u'Videos that are private will remain unlisted on YouTube. '
-                          u'Once published, video will be made public on YouTube. '),
+                          u'Videos that are private will remain unlisted on '
+                          u'YouTube. Once published, video will be made '
+                          u'public on YouTube.'),
             required=False,
             default=False)
 
@@ -94,8 +95,8 @@ class IVideo(model.Schema):
         title=_(u"Video URL"),
         description=_(u"Alternatively, you can provide a video url. "
                       u"If this is specified, video file will be ignored. "
-                      u"If video was uploaded to youtube, this field will be filled "
-                      u"with video url."),
+                      u"If video was uploaded to youtube, this field will be "
+                      u"filled with video url."),
         required=False
     )
     retrieve_thumb = schema.Bool(
