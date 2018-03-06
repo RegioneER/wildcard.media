@@ -50,7 +50,7 @@ def getDefaultHeight():
 
 class IVideo(model.Schema):
 
-    form.omitted('image')
+    # form.omitted('image')
     image = namedfile.NamedBlobImage(
         title=_(u"Cover Image"),
         description=u"",
@@ -272,7 +272,7 @@ class Video(BaseAdapter):
 
     video_file_ogv = UnsettableProperty(IVideo['video_file_ogv'])
     video_file_webm = UnsettableProperty(IVideo['video_file_webm'])
-    image = UnsettableProperty(IVideo['image'])
+    # image = UnsettableProperty(IVideo['image'])
 
     if youtube:
         upload_video_to_youtube = BasicProperty(IVideo['upload_video_to_youtube'])
