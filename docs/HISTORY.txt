@@ -2,7 +2,7 @@ Changelog
 =========
 
 3.0.0 (unreleased)
-------------
+------------------
 
 - Fix embedding a video that uses youtube via TinyMCE.
   [pbauer]
@@ -16,6 +16,12 @@ Changelog
 
 - [BREAKING] change attribute name for WildcardVideo contentype: youtube_url has
   been changed in video_url (upgrade step available)
+  [arsenico13]
+
+- Update italian translation and fixed a typo.
+  [arsenico13]
+
+- The user is now able to set a custom image for a video.
   [arsenico13]
 
 2.0.3 (2016-03-01)

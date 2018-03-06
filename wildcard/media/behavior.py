@@ -50,13 +50,6 @@ def getDefaultHeight():
 
 class IVideo(model.Schema):
 
-    # form.omitted('image')
-    image = namedfile.NamedBlobImage(
-        title=_(u"Cover Image"),
-        description=u"",
-        required=False,
-    )
-
     # main file will always be converted to mp4
     form.widget(video_file=StreamNamedFileFieldWidget)
     model.primary('video_file')
@@ -99,6 +92,13 @@ class IVideo(model.Schema):
                       u"filled with video url."),
         required=False
     )
+
+    image = namedfile.NamedBlobImage(
+        title=_(u"Cover Image"),
+        description=u"",
+        required=False,
+    )
+
     retrieve_thumb = schema.Bool(
         title=_(u'Retrieve original thumbnail from youtube'),
         description=_(u"If checked, try to download original thumbnail from "
