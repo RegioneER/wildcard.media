@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 from plone import api
 from plone.namedfile.file import NamedBlobImage
-from wildcard.media.async import (
-    convertVideoFormats,
-    uploadToYouTube,
-    removeFromYouTube,
-    updateYouTubePermissions,
-    editYouTubeVideo)
+from wildcard.media.async_support import convertVideoFormats
+from wildcard.media.async_support import uploadToYouTube
+from wildcard.media.async_support import removeFromYouTube
+from wildcard.media.async_support import updateYouTubePermissions
+from wildcard.media.async_support import editYouTubeVideo
 from wildcard.media import _
 from wildcard.media.behavior import IVideo
 from requests.exceptions import Timeout
@@ -20,17 +19,20 @@ def video_added(video, event):
             uploadToYouTube(video)
         else:
             convertVideoFormats(video)
-    if getattr(video, 'video_url', None) and getattr(video, 'retrieve_thumb', False):
+    if getattr(video, 'video_url', None) and \
+            getattr(video, 'retrieve_thumb', False):
         # it has video_url set if is a remote video or is uploaded to youtube
         retrieveThumbImage(video)
 
 
 def video_edited(video, event):
-    if getattr(video, 'video_url', None) and getattr(video, 'retrieve_thumb', False):
+    if getattr(video, 'video_url', None) and \
+            getattr(video, 'retrieve_thumb', False):
         retrieveThumbImage(video)
     elif getattr(video, 'youtube_data', False):
         if not getattr(video, 'upload_video_to_youtube', False):
-            # previously set to put on youtube, but no longer set to be on youtube
+            # previously set to put on youtube,
+            # but no longer set to be on youtube
             removeFromYouTube(video)
             convertVideoFormats(video)
         elif video.video_file and not getattr(video, 'video_converted', True):
@@ -72,7 +74,7 @@ def retrieveThumbImage(video):
     url = "https://i.ytimg.com/vi/%s/hqdefault.jpg" % video_id
     error_msg = _(
         'yt_image_download_error_label',
-        'Unable to download thumbnail image automatically from youtube. Try later.'
+        'Unable to download thumbnail image automatically from youtube. Try later.' # noqa
     )
     try:
         res = requests.get(url, stream=True, timeout=10)
@@ -98,14 +100,14 @@ def retrieveThumbImage(video):
                 'Unable to retrieve thumbnail from "%s". Not found.' % url)
             error_msg = _(
                 'yt_image_download_notfound_error_label',
-                "Unable to download thumbnail image automatically from youtube. Probably it isn't available yet. Please retry in a few minutes."
+                "Unable to download thumbnail image automatically from youtube. Probably it isn't available yet. Please retry in a few minutes." # noqa
             )
             api.portal.show_message(
                 message=error_msg,
                 request=video.REQUEST,
                 type="warning")
         else:
-            logger.error('Unable to retrieve thumbnail from "%s". Error: %s' % (url, res.status_code))
+            logger.error('Unable to retrieve thumbnail from "%s". Error: %s' % (url, res.status_code)) # noqa
             api.portal.show_message(
                 message=error_msg,
                 request=video.REQUEST,

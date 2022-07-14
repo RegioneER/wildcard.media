@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from oauthlib.oauth2 import WebApplicationClient
 from plone import api
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
 from zope.globalrequest import getRequest
+from Products.CMFPlone.utils import safe_text
 
 import json
 import requests
@@ -133,7 +135,9 @@ class GoogleAPI(object):
                     # already attempted authorization, suck, error out here
                     raise GoogleAPIException("Error uploading")
                 self.refresh_access_token()
-                return self.upload_video(named_file, title, description, second_try=True)
+                return self.upload_video(
+                    named_file, title, description, second_try=True
+                )
         upload_url = initial_resp.headers['location']
         resp = requests.put(upload_url, headers=self._headers, data=fi)
         return resp.json()
@@ -161,7 +165,7 @@ class GoogleAPI(object):
             'grant_type': 'authorization_code'
         }
         resp = requests.post(url, data=data)
-        self.registry['google_auth_data'] = unicode(resp.content)
+        self.registry['google_auth_data'] = safe_text(resp.content)
         self.req.response.redirect(self.site.absolute_url())
 
     def refresh_access_token(self):
@@ -174,7 +178,9 @@ class GoogleAPI(object):
         resp = requests.post('https://accounts.google.com/o/oauth2/token',
                              data=params)
         self.auth_data.update(resp.json())
-        self.registry['google_auth_data'] = unicode(json.dumps(self.auth_data))
+        self.registry['google_auth_data'] = safe_text(
+            json.dumps(self.auth_data)
+        )
 
     @property
     def authorized(self):
@@ -189,7 +195,7 @@ def uploadToYouTube(video):
         video.video_file, video.Title(), video.Description())
     try:
         updateYouTubePermissions(video)
-    except:
+    except Exception:
         removeFromYouTube(video)
         raise
     video_id = video.youtube_data['id']

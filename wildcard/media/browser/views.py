@@ -1,11 +1,9 @@
-import urllib
-import re
-
+# -*- coding: utf-8 -*-
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone import PloneMessageFactory as pmf
 from Products.Five import BrowserView
 from plone import api
-from plone.app.z3cform.layout import wrap_form
+from plone.z3cform.layout import wrap_form
 from plone.memoize.instance import memoize
 from wildcard.media import _
 from wildcard.media.behavior import IVideo
@@ -23,7 +21,7 @@ from zope.interface import alsoProvides
 
 from zope.component import getMultiAdapter, ComponentLookupError
 from wildcard.media.adapter import IVideoEmbedCode
-from urlparse import urlparse
+from urllib.parse import urlparse, quote_plus
 
 try:
     from wildcard.media import youtube
@@ -56,10 +54,11 @@ class AudioView(MediaView):
         self.ct = self.context.audio_file.contentType
         return self.index()
 
+
 class VideoView(BrowserView):
 
     def get_site_ID(self):
-        video_site = urlparse(self.context.video_url)[1].replace('www.','')
+        video_site = urlparse(self.context.video_url)[1].replace('www.', '')
         return video_site
 
     def getPlayerCode(self):
@@ -69,21 +68,27 @@ class VideoView(BrowserView):
 
         # Retrieve 'wcmedia-utils' view for the context then we check if
         # the video is internal
-        util=getMultiAdapter((self.context, self.request), name = "wcmedia-utils")
+        util = getMultiAdapter(
+            (self.context, self.request), name="wcmedia-utils"
+        )
         if util.mp4_url():
-            name="internal"
+            name = "internal"
 
         # Extract the domain from the URL of the video. We use it as the
-        # name for the different adapters that handle different external services.
+        # name for the different adapters that handle different external
+        # services.
         else:
-            name = urlparse(self.context.video_url)[1].replace('www.','')
+            name = urlparse(self.context.video_url)[1].replace('www.', '')
 
         try:
-            adapter = getMultiAdapter((self.context, self.request), IVideoEmbedCode, name = name)
+            adapter = getMultiAdapter(
+                (self.context, self.request), IVideoEmbedCode, name=name
+            )
         except ComponentLookupError:
-            adapter = getMultiAdapter((self.context, self.request), IVideoEmbedCode)
+            adapter = getMultiAdapter(
+                (self.context, self.request), IVideoEmbedCode
+            )
         return adapter()
-
 
     def get_embed_url(self):
         """
@@ -102,18 +107,17 @@ class VideoView(BrowserView):
             return ""
         return "https://www.youtube.com/embed/" + video_id
 
-
     def get_edit_url(self):
         """
         If the user can edit the video, returns the edit url.
         """
         if not api.user.has_permission(
-            'Modify portal content',
-            obj=self.context):
+                'Modify portal content', obj=self.context):
             return ""
         from plone.protect.utils import addTokenToUrl
         url = "%s/@@edit" % self.context.absolute_url()
         return addTokenToUrl(url)
+
 
 class DefaultGroup(group.Group):
     label = u"Default"
@@ -121,12 +125,14 @@ class DefaultGroup(group.Group):
         "additional_video_formats", "async_quota_size",
         "default_video_width", "default_video_height")
 
+
 class ConversionSettingsGroup(group.Group):
     label = u"Conversion settings"
     fields = field.Fields(IGlobalMediaSettings).select(
         "force", "avconv_in_mp4", "avconv_out_mp4",
         "avconv_in_webm", "avconv_out_webm",
         "avconv_in_ogg", "avconv_out_ogg")
+
 
 class GlobalSettingsForm(group.GroupForm, form.EditForm):
     groups = (DefaultGroup, ConversionSettingsGroup)
@@ -145,6 +151,7 @@ class GlobalSettingsForm(group.GroupForm, form.EditForm):
         self.applyChanges(data)
 
         self.status = pmf('Changes saved.')
+
 
 GlobalSettingsFormView = wrap_form(GlobalSettingsForm)
 
@@ -230,7 +237,7 @@ class Utils(MediaView):
     def mp4_url_quoted(self):
         url = self.mp4_url()
         if url:
-            return urllib.quote_plus(url)
+            return quote_plus(url)
         else:
             return url
 
@@ -238,7 +245,7 @@ class Utils(MediaView):
     def image_url_quoted(self):
         url = self.image_url()
         if url:
-            return urllib.quote_plus(url)
+            return quote_plus(url)
         else:
             return url
 
@@ -247,7 +254,9 @@ class AuthorizeGoogle(BrowserView):
 
     def __call__(self):
         if not youtube:
-            raise Exception("Error, dependencies for youtube support not present")
+            raise Exception(
+                "Error, dependencies for youtube support not present"
+            )
         if self.request.get('code'):
             alsoProvides(self.request, IDisableCSRFProtection)
             return youtube.GoogleAPI(self.request).confirm_authorization()

@@ -4,6 +4,9 @@ Changelog
 3.0.0 (unreleased)
 ------------------
 
+- Add support for Python 3 and Plone 5.2.
+  [cesku]
+
 - Fix embedding a video that uses youtube via TinyMCE.
   [pbauer]
 
