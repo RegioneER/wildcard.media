@@ -1,14 +1,14 @@
-from zope.interface import implements, implementer, implementsOnly
-from zope.component import adapter, getMultiAdapter
+# -*- coding: utf-8 -*-
+from Acquisition import aq_inner
+from plone.formwidget.namedfile.interfaces import INamedFileWidget
+from plone.formwidget.namedfile.widget import NamedFileWidget
+from plone.namedfile.browser import Download
+from plone.namedfile.interfaces import INamedFileField
+from plone.namedfile.utils import stream_data
 from z3c.form.interfaces import IFieldWidget, IFormLayer, IDataManager
 from z3c.form.widget import FieldWidget
-from plone.formwidget.namedfile.interfaces import INamedFileWidget
-from plone.formwidget.namedfile.widget import NamedFileWidget, Download
-from plone.namedfile.interfaces import INamedFileField
-from plone.namedfile.utils import get_contenttype
-from plone.app.blob.field import BlobWrapper
-
-from Acquisition import aq_inner
+from zope.component import adapter, getMultiAdapter
+from zope.interface import implementer, implementer_only
 from zope.publisher.interfaces import NotFound
 
 
@@ -16,8 +16,9 @@ class IStreamNamedFileWidget(INamedFileWidget):
     pass
 
 
+@implementer_only(IStreamNamedFileWidget)
 class StreamNamedFileWidget(NamedFileWidget):
-    implementsOnly(IStreamNamedFileWidget)
+    pass
 
 
 @implementer(IFieldWidget)
@@ -26,24 +27,23 @@ def StreamNamedFileFieldWidget(field, request):
     return FieldWidget(field, StreamNamedFileWidget(request))
 
 
-
 class MediaStream(Download):
     """ Browser view for handling media streaming requests.
     """
 
     def __call__(self):
         """ Partially reproduced from plone.formwidget.namedfile.widget.Download.
-
-        Leverages the existing BlobWrapper functionality to stream the media blobs
-        to the client, allowing ranges and partial content.
         """
         if self.context.ignoreContext:
-            raise NotFound("Cannot get the data file from a widget with no context")
+            raise NotFound(
+                "Cannot get the data file from a widget with no context"
+            )
 
         if self.context.form is not None:
             content = aq_inner(self.context.form.getContent())
         else:
             content = aq_inner(self.context.context)
+
         field = aq_inner(self.context.field)
 
         dm = getMultiAdapter((content, field,), IDataManager)
@@ -51,8 +51,5 @@ class MediaStream(Download):
         if file_ is None:
             raise NotFound(self, self.request)
 
-        content_type = get_contenttype(file_)
-        blob_wrapper = BlobWrapper(content_type)
-        blob_wrapper.setBlob(file_)
-
-        return blob_wrapper.index_html(self.request)
+        request_range = self.handle_request_range(file_)
+        return stream_data(file_, **request_range)

@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from videoembedcode import IVideoEmbedCode
+from .videoembedcode import IVideoEmbedCode # noqa

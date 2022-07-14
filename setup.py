@@ -32,17 +32,17 @@ setup(name='wildcard.media',
           'plone.app.dexterity',
           'plone.autoform',
           'plone.app.textfield',
-          'plone.app.blob',
+          'plone.namedfile>=5.4.0',
           'plone.rfc822',
           'plone.supermodel>=1.1',
           'five.globalrequest',
           'plone.api',
           'requests'
+          
       ],
       extras_require={
           'test': [
               'plone.app.testing',
-              'unittest2'
           ],
           'youtube': [
               'requests',

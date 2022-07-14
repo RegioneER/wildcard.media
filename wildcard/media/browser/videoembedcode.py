@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from wildcard.media.interfaces import IVideoEnabled
-from zope.interface import implements
+from zope.interface import implementer
 from zope.browserpage.viewpagetemplatefile import ViewPageTemplateFile
 
 from wildcard.media.adapter import IVideoEmbedCode
-from urlparse import urlparse
+from urllib.parse import urlparse
 from wildcard.media.behavior import IVideo
 
 
+@implementer(IVideoEnabled)
 class VideoEmbedCode(object):
     """ Internal video adapter
     """
-
-    implements(IVideoEnabled)
+    
     template = ViewPageTemplateFile('templates/internalvideo_template.pt')
 
     def __init__(self, context, request):
@@ -24,12 +24,12 @@ class VideoEmbedCode(object):
         return self.template()
 
 
+@implementer(IVideoEmbedCode)
 class ClassicYoutubeEmbedCode(object):
     """ ClassicYoutubeEmbedCode
     Provides a way to have the html code to embed Youtube video in a web page
     """
-
-    implements(IVideoEmbedCode)
+    
     template = ViewPageTemplateFile('templates/youtubeembedcode_template.pt')
 
     def __init__(self, context, request):
